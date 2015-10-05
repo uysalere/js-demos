@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
   <title>HTMLCanvasElement capture into MediaStream demo</title>
 </head>
-<body>
+<body id="body" onload="main()">
   <div> Create Real-Time stream from < canvas > and play it back.</div>
 </body>
 <canvas id="c" width="480" height="270" class="centeredcanvas"></canvas>
 </br>
 <button id="btn1" onclick="startStreaming()">Create Stream from < canvas ></button>
 
-<script type="text/javascript" src="dimsum.js"></script>
-<script type="text/javascript" src="example1.js"></script>
+<script type="application/javascript" src="webgl-utils.js"></script>
+<script type="application/javascript" src="webgl-debug.js"></script>
+<script type="application/javascript" src="matrix4x4.js"></script>
+<script type="application/javascript" src="cameracontroller.js"></script>
+<script type="application/javascript" src="teapot-streams.js"></script>
+<script type="application/javascript" src="demo.js"></script>
+<script type="application/javascript" src="dimsum.js"></script>
 <script>
+var theStream;
+var thePlayback;
 
-  var theStream;
-  var thePlayback;
-
-  function startStreaming() {
+function startStreaming() {
     document.getElementById("btn1").disabled = true;
 
   // Create a MediaStream out of the <canvas> tag.
@@ -45,4 +49,10 @@ function stopStreaming() {
 }
 
 </script>
+    <style type="text/css">
+      .centeredcanvas {
+        margin: 0px auto;
+        /* pointer-events: none; */
+      }
+    </style>
 </html>

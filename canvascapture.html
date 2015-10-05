@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>HTMLCanvasElement capture into MediaStream demo</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>HTMLCanvasElement capture into MediaStream demo</title>
 </head>
 <body>
-<div> Record Real-Time canvas and play it back.</div>
+  <div> Create Real-Time stream from < canvas > and play it back.</div>
 </body>
 
 <video id="v" muted="true" hidden controls autoplay loop>
@@ -19,27 +19,27 @@
 
 <script type="text/javascript" src="dimsum.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function(){
+  document.addEventListener('DOMContentLoaded', function(){
     var v = document.getElementById('v');
     var c = document.getElementById('c');
     var context = c.getContext('2d');
     v.addEventListener('play', function(){
-        draw(this,context,c.clientWidth,c.clientHeight);
+      draw(this,context,c.clientWidth,c.clientHeight);
     },false);
 
-},false);
+  },false);
 
-function draw(v,c,w,h) {
+  function draw(v,c,w,h) {
     if(v.paused || v.ended) return false;
     c.drawImage(v,0,0,w,h);
     setTimeout(draw,20,v,c,w,h);
-}
+  }
 
-var theStream;
-var thePlayback;
+  var theStream;
+  var thePlayback;
 
-function startStreaming() {
-  document.getElementById("btn1").disabled = true;
+  function startStreaming() {
+    document.getElementById("btn1").disabled = true;
 
   // Create a MediaStream out of the <canvas> tag.
   theStream = document.getElementById("c").captureStream();
