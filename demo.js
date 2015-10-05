@@ -71,8 +71,8 @@ function main() {
     c.addEventListener('webglcontextrestored', handleContextRestored, false);
 
 	var ratio = window.devicePixelRatio ? window.devicePixelRatio : 1;
-	c.width = 800 * ratio;
-	c.height = 600 * ratio;
+	c.width = 480 * ratio;
+	c.height = 270 * ratio;
     gl = WebGLUtils.setupWebGL(c);
     if (!gl)
         return;
