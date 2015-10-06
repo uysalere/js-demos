@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>HTMLCanvasElement capture into MediaStream demo</title>
+</head>
+<body>
+  <div> Create Real-Time stream from < canvas > and play it back.</div>
+</body>
+
+<video id="v" muted="true" hidden controls autoplay loop>
+  <source src="http://video.webmfiles.org/big-buck-bunny_trailer.webm" type="video/webm"  />
+</video>
+
+<canvas id="c" width="480" height="270"></canvas>
+
+</br>
+<button id="btn1" onclick="startStreaming()">Create Stream from < canvas > 10 fps</button>
+
+<script type="text/javascript" src="dimsum.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    var v = document.getElementById('v');
+    var c = document.getElementById('c');
+    var context = c.getContext('2d');
+    v.addEventListener('play', function(){
+      draw(this,context,c.clientWidth,c.clientHeight);
+    },false);
+
+  },false);
+
+  function draw(v,c,w,h) {
+    if(v.paused || v.ended) return false;
+    c.drawImage(v,0,0,w,h);
+    setTimeout(draw,20,v,c,w,h);
+  }
+
+  var theStream;
+  var thePlayback;
+
+  function startStreaming() {
+    document.getElementById("btn1").disabled = true;
+
+  // Create a MediaStream out of the <canvas> tag.
+  theStream = document.getElementById("c").captureStream(10);
+  document.body.appendChild(document.createElement("br"));
+  createButton("btn2", "Play back captured Stream to a <canvas>", startPlayback);
+  document.body.appendChild(document.createElement("br"));
+}
+
+function startPlayback() {
+  document.getElementById("btn2").disabled = true;
+
+  // And plug the created MediaStream into another <video> tag.
+  createVideoTag("playbackTag", 480, 270, theStream);
+  thePlayback = document.getElementById("playbackTag");
+  document.body.appendChild(document.createElement("br"));
+
+  createButton("btn3", "Stop theStream captured from <canvas>", stopStreaming);
+}
+
+function stopStreaming() {
+  document.getElementById("btn3").disabled = true;
+  theStream.getVideoTracks()[0].stop();
+}
+
+</script>
+</html>
