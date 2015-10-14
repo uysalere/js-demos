@@ -53,6 +53,7 @@ window.addEventListener('load', function () {
       context.moveTo(x, y);
       started = true;
     } else {
+      context.strokeStyle="#FF0204";
       context.lineTo(x, y);
       context.stroke();
     }

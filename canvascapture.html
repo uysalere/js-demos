@@ -12,7 +12,7 @@
   <source src="http://video.webmfiles.org/big-buck-bunny_trailer.webm" type="video/webm"  />
 </video>
 
-<canvas id="c" width="480" height="270"></canvas>
+<canvas id="c" width="1920" height="1080"></canvas>
 
 </br>
 <button id="btn1" onclick="startStreaming()">Create Stream from < canvas ></button>
@@ -52,7 +52,7 @@ function startPlayback() {
   document.getElementById("btn2").disabled = true;
 
   // And plug the created MediaStream into another <video> tag.
-  createVideoTag("playbackTag", 480, 270, theStream);
+  createVideoTag("playbackTag", 1920, 1080, theStream);
   thePlayback = document.getElementById("playbackTag");
   document.body.appendChild(document.createElement("br"));
 
