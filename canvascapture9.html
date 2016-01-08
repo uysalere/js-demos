@@ -538,7 +538,7 @@ $(function(){
 </script>
 </head>
 <body>
-  <div> Create Real-Time stream from < canvas > and play it back. WebGLeffects demo.</div>
+  <div> Create Real-Time stream from < canvas > and play it back. WebGL effects on getUserMedia() demo.</div>
 <div id="viewContainer">
 <canvas id="canvas" width="640" height="480" style="width: 100%; height: 100%;"></canvas>
 </div>
@@ -549,7 +549,6 @@ $(function(){
 </div>
 <div style="display:none;">
 <video id="vid">
-  <source src="big-buck-bunny_trailer.webm" type="video/webm"/>
 </video>
 </div>
 <br style="clear:both" />
@@ -559,6 +558,36 @@ $(function(){
 </body>
 <script type="text/javascript" src="dimsum.js"></script>
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+  var v = document.getElementById('vid');
+  navigator.getUserMedia = (navigator.getUserMedia ||
+                           navigator.webkitGetUserMedia ||
+                           navigator.mozGetUserMedia ||
+                           navigator.msGetUserMedia);
+  if (navigator.getUserMedia) {
+    // Request access to video only
+    navigator.getUserMedia(
+       {
+          video:true,
+          audio:false
+       },
+       function(stream) {
+          var url = window.URL || window.webkitURL;
+          v.src = url ? url.createObjectURL(stream) : stream;
+          v.play();
+       },
+       function(error) {
+          alert('Something went wrong. (error code ' + error.code + ')');
+          return;
+       }
+    );
+  }
+  else {
+    alert('Sorry, the browser you are using doesn\'t support getUserMedia');
+    return;
+  }
+},false);;
+
   var theStream;
   var thePlayback;
 
