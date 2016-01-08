@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>HTMLCanvasElement capture into MediaStream demo</title>
+</head>
+<body>
+  <div> Create Real-Time stream from < audio > and play it back.</div>
+</body>
+
+<audio id="au" controls autoplay loop>
+  <source src="big-buck-bunny_trailer.webm" type="video/webm"  />
+</audio>
+
+</br>
+<button id="btn1" onclick="startStreaming()">Create Stream from < canvas ></button>
+
+<script type="text/javascript" src="dimsum.js"></script>
+<script>
+var theStream;
+var thePlayback;
+
+function startStreaming() {
+  document.getElementById("btn1").disabled = true;
+
+  // Create a MediaStream out of the <canvas> tag.
+  var audioSource = document.getElementById("au");
+  audioSource.muted = true;
+  theStream = audioSource.captureStream();
+  document.body.appendChild(document.createElement("br"));
+  createButton("btn2", "Play back captured Stream to a <video>", startPlayback);
+  document.body.appendChild(document.createElement("br"));
+}
+
+function startPlayback() {
+  document.getElementById("btn2").disabled = true;
+
+  // And plug the created MediaStream into another <video> tag.
+  createVideoTag("playbackTag", 500, 50, theStream);
+  thePlayback = document.getElementById("playbackTag");
+  thePlayback.controls = true;
+  document.body.appendChild(document.createElement("br"));
+
+  createButton("btn3", "Stop theStream captured from <video>", stopStreaming);
+}
+
+function stopStreaming() {
+  document.getElementById("btn3").disabled = true;
+  theStream.getVideoTracks()[0].stop();
+}
+
+</script>
+</html>

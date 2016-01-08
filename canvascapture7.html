@@ -12,7 +12,7 @@
   <source src="big-buck-bunny_trailer.webm" type="video/webm"  />
 </video>
 
-<canvas id="c" width="1280" height="720"></canvas>
+<canvas id="c" width="1280" height="720" hidden></canvas>
 
 </br>
 <button id="btn1" onclick="startStreaming()">Create Stream from < canvas ></button>
@@ -61,15 +61,14 @@ function startPlayback() {
 
   createButton("btn3", "Stop original track", stopTrack);
   createButton("btn4", "Stop theStream captured from <canvas>", stopStreaming);
+  createButton("btn4", "Start theStream captured from <canvas>", startStreaming);
 }
 
 function stopTrack() {
-  document.getElementById("btn3").disabled = true;
-  track.stop();
+  document.getElementById("v").stop();
 }
 
 function stopStreaming() {
-  document.getElementById("btn4").disabled = true;
   theStream.getVideoTracks()[0].stop();
 }
 
