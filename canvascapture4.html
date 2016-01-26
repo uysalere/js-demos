@@ -46,7 +46,7 @@ Frame rate: <input type="number" id="fps" value="5">
   var num = document.getElementById("fps").value;
   theStream = document.getElementById("c").captureStream(num);
   document.body.appendChild(document.createElement("br"));
-  createButton("btn2", "Play back captured Stream to a <canvas> with frame rate " + num, startPlayback);
+  createButton("btn2", "Play back captured Stream to a <video> with frame rate " + num, startPlayback);
   document.body.appendChild(document.createElement("br"));
 }
 
