@@ -13,7 +13,7 @@
 </video>
 
 <canvas id="c" width="1280" height="720"></canvas>
-
+<div id="div1"> </div>
 </br>
 <button id="btn1" onclick="startStreaming()">Create Stream from < canvas ></button>
 
@@ -21,7 +21,11 @@
 <script>
   document.addEventListener('DOMContentLoaded', function(){
     var v = document.getElementById('v');
-    var c = document.getElementById('c');
+    // c = document.createElement('canvas');
+    // document.getElementById('div1').appendChild(c);
+    c = document.getElementById('c');
+    // c.hidden = true;
+
     var context = c.getContext('2d');
     v.addEventListener('play', function(){
       draw(this,context,c.clientWidth,c.clientHeight);
@@ -35,6 +39,7 @@
     setTimeout(draw,20,v,c,w,h);
   }
 
+  var c;
   var theStream;
   var thePlayback;
 
@@ -42,7 +47,7 @@
     document.getElementById("btn1").disabled = true;
 
   // Create a MediaStream out of the <canvas> tag.
-  theStream = document.getElementById("c").captureStream();
+  theStream = c.captureStream();
   document.body.appendChild(document.createElement("br"));
   createButton("btn2", "Play back captured Stream to a <canvas>", startPlayback);
   document.body.appendChild(document.createElement("br"));
