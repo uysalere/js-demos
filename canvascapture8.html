@@ -249,6 +249,11 @@ function initialize() {
   fast = tdl.fast;
   canvas = document.getElementById("canvas");
 
+  // canvas = document.createElement('canvas');
+  // canvas.id = 'canvas';
+  // canvas.hidden = true;
+  // document.getElementById('viewContainer').appendChild(canvas);
+
   gl = tdl.webgl.setupWebGL(canvas);
   if (!gl) {
     return false;
@@ -548,12 +553,11 @@ $(function(){
   </div>
 </div>
 <div style="display:none;">
-<video id="vid">
+<video id="vid" hidden>
   <source src="big-buck-bunny_trailer.webm" type="video/webm"/>
 </video>
 </div>
 <br style="clear:both" />
-</body>
 </br>
 <button id="btn1" onclick="startStreaming()">Create Stream from < canvas ></button>
 </body>
@@ -566,7 +570,7 @@ $(function(){
     document.getElementById("btn1").disabled = true;
 
   // Create a MediaStream out of the <canvas> tag.
-  theStream = document.getElementById("canvas").captureStream();
+  theStream = canvas.captureStream();
   document.body.appendChild(document.createElement("br"));
   createButton("btn2", "Play back captured Stream to a <canvas>", startPlayback);
   document.body.appendChild(document.createElement("br"));

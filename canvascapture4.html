@@ -15,7 +15,8 @@
 <canvas id="c" width="480" height="270"></canvas>
 
 </br>
-<button id="btn1" onclick="startStreaming()">Create Stream from < canvas > 5 fps</button>
+Frame rate: <input type="number" id="fps" value="5">
+<button id="btn1" onclick="startStreaming()">Create Stream from < canvas > with frame rate</button>
 
 <script type="text/javascript" src="dimsum.js"></script>
 <script>
@@ -42,9 +43,10 @@
     document.getElementById("btn1").disabled = true;
 
   // Create a MediaStream out of the <canvas> tag.
-  theStream = document.getElementById("c").captureStream(5);
+  var num = document.getElementById("fps").value;
+  theStream = document.getElementById("c").captureStream(num);
   document.body.appendChild(document.createElement("br"));
-  createButton("btn2", "Play back captured Stream to a <canvas>", startPlayback);
+  createButton("btn2", "Play back captured Stream to a <canvas> with frame rate " + num, startPlayback);
   document.body.appendChild(document.createElement("br"));
 }
 

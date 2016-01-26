@@ -1,0 +1,398 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+  <title>WebRTC PeerConnection Manual Test</title>
+  <!-- Load the polyfill to switch-hit between Chrome and Firefox -->
+  <script src="adapter.js"></script>
+  <script src="peerconnection_manual.js"></script>
+  <script type="application/javascript" src="webgl-utils.js"></script>
+  <script src="J3DI.js"> </script>
+  <script src="J3DIMath.js" type="application/javascript"> </script>
+  <link rel="StyleSheet" href="stylesheet.css">
+  <meta charset="utf-8">
+</head>
+<body>
+
+<div id="wrapper">
+  <div id="header" hidden>
+    GetUserMedia <a href="http://goo.gl/V7cZg">MediaStreamConstraints</a>:
+    <input type="text" id="getusermedia-constraints" wrap="soft">
+    Audio<input type="checkbox" id="audio" checked
+        onclick="updateGetUserMediaConstraints();"/>
+    Video<input type="checkbox" id="video" checked
+        onclick="updateGetUserMediaConstraints();"/>
+    Screen capture<input type="checkbox" id="screencapture"
+        onclick="updateGetUserMediaConstraints();"/>
+    <button class="button-green" id="re-request"
+        onclick="getUserMediaFromHere();">Request GetUserMedia</button><br/>
+    Audio source <select class="drop-down" id="audiosrc"
+        onchange="updateGetUserMediaConstraints();"></select>
+    Video source <select class="drop-down" id="videosrc"
+        onchange="updateGetUserMediaConstraints();"></select>
+    Optional min size <input type="text" id="video-width" value="1280"
+        size="5px" onblur="updateGetUserMediaConstraints();">
+    x <input type="text" id="video-height" value="720" size="5px"
+        onblur="updateGetUserMediaConstraints();">
+    <button id="get-devices" onclick="getDevices();">
+        Get devices</button>
+    Onload<input type="checkbox" id="get-devices-onload">
+    You can also use <a href="constraints.html">constraints.html</a>&nbsp;&nbsp;
+    <a href="peerconnection-help.html" target="_blank">Help</a>
+    <br/>
+  </div>
+    <button id="get-devices" onclick="startDrawingOnCanvas();">
+    Start drawing on Canvas for input</button>
+
+  <div id="container">
+    <div class="left">
+        <div>
+          <h2>Local Preview</h2>
+          <video width="320" height="240" id="local-view" loop hidden
+              muted>
+          <source src="big-buck-bunny_trailer.webm" type="video/webm"  />
+          </video>
+          <canvas id="c" width="320" height="240"></canvas>
+        </div>
+        <div>
+          <div>
+            Size: <div id="local-view-size" class="inline-contents"></div>
+            <div id="local-view-stream-size" class="inline-contents">(stream
+                size: N/A)</div><br/>
+          </div>
+          <div>
+            Resize: <button onclick="updateVideoTagSize('local-view')"> To
+                stream size</button>
+            <button onclick="updateVideoTagSize('local-view', 320, 240);">
+                320x240</button>
+            <button onclick="updateVideoTagSize('local-view', 640, 480);">
+                640x480</button>
+          </div>
+        </div>
+
+      <h2>Send on data channel</h2>
+      <input type="text" id="data-channel-send" size="10" />
+      <button onclick="sendDataFromHere();">Send data</button><br>
+
+      <h2>Settings</h2>
+      Server [<a href="" onclick="showServerHelp();">?</a>]:
+      <input type="text" id="pc-server" size="30"
+          value="http://localhost:8888"/>
+      Peer ID: <input type="text" id="peer-id" size="10" />
+      <button class="button-green" id="connect" onclick="connectFromHere();">
+          Connect</button><br/>
+
+      PeerConnection Constraints:
+      CPU overuse <input type="checkbox" id="cpuoveruse-detection"
+          onclick="setPeerConnectionConstraints();" checked="true"/>
+      RTP <input type="checkbox" id="data-channel-type-rtp"
+          onclick="setPeerConnectionConstraints();"><br/>
+      <input class="width-100" type="text" id="pc-constraints" value="{}" ><br/>
+      PeerConnection <a href="http://goo.gl/xVi12">
+          createOffer MediaConstraints:</a><br/>
+      <input type="text" class="width-100" id="pc-createoffer-constraints"
+          value="{}"/><br/>
+      PeerConnection <a href="http://goo.gl/0TjfX">
+          createAnswer MediaConstraints:</a><br/>
+      <input type="text" class="width-100" id="pc-createanswer-constraints"
+          value="{}"/><br/>
+
+      Call:
+      <button class="button-green" onclick="negotiateCallFromHere();">Negotiate
+          </button>
+      <button class="button-red" onclick="hangUpFromHere();">Hang up</button>
+          <br/>
+
+      Local Stream:
+      <button class="button-green" onclick="addLocalStreamFromHere();">Add
+          </button>
+      <button class="button-red" onclick="removeLocalStreamFromHere();">Remove
+          </button>
+      <button class="button-red" onclick="stopLocalFromHere();">Stop</button>
+      <button onclick="toggleLocalVideoFromHere();">Toggle Video</button>
+      <button onclick="toggleLocalAudioFromHere();">Toggle Audio</button><br/>
+
+      Remote Stream:
+      <button onclick="toggleRemoteVideoFromHere();">Toggle Video</button>
+      <button onclick="toggleRemoteAudioFromHere();">Toggle Audio</button><br/>
+
+      Data Channel:
+      <button onclick="createDataChannelFromHere();">Create</button>
+      <button onclick="closeDataChannelFromHere();">Close</button>
+      status:
+      <input type="text" id="data-channel-status" size="10" value="not created"
+          disabled="true" /><br/>
+
+      DTMF Sender:
+      <button onclick="createDtmfSenderFromHere();">Create</button>
+      tones:
+      <input type="text" id="dtmf-tones" size="10" value="123,abc" />
+      duration(ms):
+      <input type="text" id="dtmf-tones-duration" size="10" value="100" />
+      gap(ms):
+      <input type="text" id="dtmf-tones-gap" size="10" value="50" />
+      <button onclick="insertDtmfFromHere();">Send</button><br/>
+
+      Options:
+      <input type="checkbox" id="force-isac" onclick="forceIsacChanged();"/>
+      Force iSAC in Outgoing SDP<br/>
+      <button onclick="clearLog();">Clear Logs</button>
+    </div>
+
+    <div class="right">
+      <div>
+        <h2>Remote Video</h2>
+          <video width="320" height="240" id="remote-view" autoplay="autoplay">
+              </video><br/>
+      </div>
+      <div>
+        <div>
+          Size: <div id="remote-view-size" class="inline-contents"></div>
+          <div id="remote-view-stream-size" class="inline-contents">(stream size
+              :N/A)</div><br/>
+        </div>
+        <div>
+          Resize: <button onclick="updateVideoTagSize('remote-view')"> To
+              stream size</button>
+          <button onclick="updateVideoTagSize('remote-view', 320, 240);">
+              320x240</button>
+          <button onclick="updateVideoTagSize('remote-view', 640, 480);">
+              640x480</button>
+        </div>
+      </div>
+
+      <h2>Received on data channel</h2>
+      <textarea id="data-channel-receive" rows="7" cols="40" disabled="true">
+          </textarea>
+
+      <h2>Sent DTMF tones</h2>
+      <textarea id="dtmf-tones-sent" rows="7" cols="40" disabled="true">
+          </textarea>
+    </div>
+
+    <div id="footer">
+      <div class="left">
+        <h2>Messages</h2>
+        <pre id="messages"></pre>
+      </div>
+
+      <div class="right">
+        <h2>Debug</h2>
+        <pre id="debug"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+
+<script>
+
+  function startDrawingOnCanvas() {
+    var v = document.getElementById('local-view');
+    v.play();
+    var c = document.getElementById('c');
+
+    var context = initWebGL("c", "vshader", "fshader", [ "vPosition"], [ 0, 0, 0, 1 ], 1);
+    context.clearColor(1, 1, 0, 1);
+    v.addEventListener('play', function(){
+      draw(this,context,c.clientWidth,c.clientHeight);
+    },false);
+
+  }
+
+  function draw(v,c,w,h) {
+    c.drawArrays(c.TRIANGLES, 0, 100);
+    setTimeout(draw,2000,v,c,w,h);
+  }
+
+</script>
+
+<script>
+        var g = {};  // globals
+        function init()
+        {
+            var gl = initWebGL("c");
+            if (!gl) {
+              return;
+            }
+            g.program = simpleSetup(gl, "vshader", "fshader",
+                                [ "vNormal", "vTexCoord", "vPosition"],
+                                [ 0, 0, 0, 1 ], 10000);
+
+            gl.uniform3f(gl.getUniformLocation(g.program, "lightDir"), 0, 0, 1);
+            gl.uniform1i(gl.getUniformLocation(g.program, "sampler2d"), 0);
+
+            if (g.program) {
+                g.u_normalMatrixLoc = gl.getUniformLocation(g.program, "u_normalMatrix");
+                g.u_modelViewProjMatrixLoc = gl.getUniformLocation(g.program, "u_modelViewProjMatrix");
+            }
+
+            g.sphere = makeSphere(gl, 1, 30, 30);
+
+            // get the images
+            earthTexture = loadImageTexture(gl, "earthmap1k.jpg");
+            marsTexture = loadImageTexture(gl, "mars500x250.png");
+
+            return gl;
+        }
+
+        var width = -1;
+        var height = -1;
+        var framerate;
+        var requestId;
+
+        function reshape(ctx)
+        {
+            var canvas = document.getElementById('c');
+            if (canvas.width == width && canvas.height == height)
+                return;
+
+            width = canvas.width;
+            height = canvas.height;
+
+            ctx.viewport(0, 0, width, height);
+
+            g.perspectiveMatrix = new J3DIMatrix4();
+            g.perspectiveMatrix.perspective(30, width/height, 1, 10000);
+            g.perspectiveMatrix.lookat(0,0,6, 0, 0, 0, 0, 1, 0);
+        }
+
+        function drawOne(ctx, angle, x, y, z, scale, texture)
+        {
+            // setup VBOs
+            ctx.enableVertexAttribArray(0);
+            ctx.enableVertexAttribArray(1);
+            ctx.enableVertexAttribArray(2);
+
+            ctx.bindBuffer(ctx.ARRAY_BUFFER, g.sphere.vertexObject);
+            ctx.vertexAttribPointer(2, 3, ctx.FLOAT, false, 0, 0);
+
+            ctx.bindBuffer(ctx.ARRAY_BUFFER, g.sphere.normalObject);
+            ctx.vertexAttribPointer(0, 3, ctx.FLOAT, false, 0, 0);
+
+            ctx.bindBuffer(ctx.ARRAY_BUFFER, g.sphere.texCoordObject);
+            ctx.vertexAttribPointer(1, 2, ctx.FLOAT, false, 0, 0);
+
+            ctx.bindBuffer(ctx.ELEMENT_ARRAY_BUFFER, g.sphere.indexObject);
+
+            // generate the model-view matrix
+            var mvMatrix = new J3DIMatrix4();
+            mvMatrix.translate(x,y,z);
+            mvMatrix.rotate(30, 1,0,0);
+            mvMatrix.rotate(angle, 0,1,0);
+            mvMatrix.scale(scale, scale, scale);
+
+            // construct the normal matrix from the model-view matrix
+            var normalMatrix = new J3DIMatrix4(mvMatrix);
+            normalMatrix.invert();
+            normalMatrix.transpose();
+            normalMatrix.setUniform(ctx, g.u_normalMatrixLoc, false);
+
+            // construct the model-view * projection matrix
+            var mvpMatrix = new J3DIMatrix4(g.perspectiveMatrix);
+            mvpMatrix.multiply(mvMatrix);
+            mvpMatrix.setUniform(ctx, g.u_modelViewProjMatrixLoc, false);
+
+            ctx.bindTexture(ctx.TEXTURE_2D, texture);
+            ctx.drawElements(ctx.TRIANGLES, g.sphere.numIndices, ctx.UNSIGNED_SHORT, 0);
+        }
+
+        function drawPicture(ctx)
+        {
+            reshape(ctx);
+            ctx.clear(ctx.COLOR_BUFFER_BIT | ctx.DEPTH_BUFFER_BIT);
+
+            drawOne(ctx, currentAngle, -1, 0, 0, 1, earthTexture);
+            drawOne(ctx, -currentAngle, 1, 0, 0, 0.6, marsTexture);
+
+            framerate.snapshot();
+
+            currentAngle += incAngle;
+            if (currentAngle > 360)
+                currentAngle -= 360;
+        }
+
+        function startDrawingOnCanvas()
+        {
+            var c = document.getElementById("c");
+            var w = Math.floor(window.innerWidth * 0.9);
+            var h = Math.floor(window.innerHeight * 0.9);
+
+            //c = WebGLDebugUtils.makeLostContextSimulatingCanvas(c);
+            // tell the simulator when to lose context.
+            //c.loseContextInNCalls(1500);
+
+            c.addEventListener('webglcontextlost', handleContextLost, false);
+            c.addEventListener('webglcontextrestored', handleContextRestored, false);
+
+            // c.width = w;
+            // c.height = h;
+
+            var ctx = init();
+            if (!ctx) {
+              return;
+            }
+
+            framerate = new Framerate("framerate");
+            currentAngle = 0;
+            incAngle = 0.2;
+
+            function f() {
+              drawPicture(ctx)
+              requestId = window.requestAnimFrame(f, c);
+            };
+            f();
+
+            function handleContextLost(e) {
+                e.preventDefault();
+                clearLoadingImages();
+                if (requestId !== undefined) {
+                    window.cancelAnimFrame(requestId);
+                    requestId = undefined;
+                }
+            }
+
+            function handleContextRestored() {
+                init();
+                f();
+            }
+
+        }
+    </script>
+
+    <script id="vshader" type="x-shader/x-vertex">
+        uniform mat4 u_modelViewProjMatrix;
+        uniform mat4 u_normalMatrix;
+        uniform vec3 lightDir;
+
+        attribute vec3 vNormal;
+        attribute vec4 vTexCoord;
+        attribute vec4 vPosition;
+
+        varying float v_Dot;
+        varying vec2 v_texCoord;
+
+        void main()
+        {
+            gl_Position = u_modelViewProjMatrix * vPosition;
+            v_texCoord = vTexCoord.st;
+            vec4 transNormal = u_normalMatrix * vec4(vNormal,1);
+            v_Dot = max(dot(transNormal.xyz, lightDir), 0.0);
+        }
+    </script>
+
+    <script id="fshader" type="x-shader/x-fragment">
+        precision mediump float;
+
+        uniform sampler2D sampler2d;
+
+        varying float v_Dot;
+        varying vec2 v_texCoord;
+
+        void main()
+        {
+            vec4 color = texture2D(sampler2d,v_texCoord);
+            color += vec4(0.1,0.1,0.1,1);
+            gl_FragColor = vec4(color.xyz * v_Dot, color.a);
+        }
+    </script>
+</html>
