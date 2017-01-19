@@ -1,0 +1,85 @@
+<!doctype html>
+<title>HTMLCanvasElement.captureStream() test</title>
+<style>
+div{border:1px dotted grey; margin-bottom:1em}
+canvas,video{background:#eee}
+</style>
+
+<div>
+	<h2>This capture uses a 2d context</h2>
+	<canvas id="c0" width="400" height="200"></canvas>
+	<video id="v0" width="400" height="200" loop controls autoplay></video>
+	<video id="vp0" width="400" height="200" loop controls autoplay></video>
+</div>
+
+<div>
+	<h2>This capture uses a bitmaprenderer context</h2>
+	<canvas id="c1" width="400" height="200"></canvas>
+	<video id="v1" width="400" height="200" loop controls autoplay></video>
+	<video id="vp1" width="400" height="200" loop controls autoplay></video>
+</div>
+
+<script>
+"use strict";
+
+const cx0 = c0.getContext('2d'),
+cx1 = c1.getContext('bitmaprenderer'),
+c2 = new OffscreenCanvas(400,200),
+cx2 = c2.getContext('2d'),
+stream0 = c0.captureStream(),
+stream1 = c1.captureStream(),
+recorder0 = new MediaRecorder( stream0 ),
+recorder1 = new MediaRecorder( stream1 );
+vp0.src = URL.createObjectURL(stream0);
+vp1.src = URL.createObjectURL(stream1);
+
+recorder0.ondataavailable = function(e)
+{
+	v0.src = URL.createObjectURL( e.data );
+};
+recorder1.ondataavailable = function(e)
+{
+	const data = e.data;
+	console.assert( data.size > 0, 'Zero sized blob', data );
+	v1.src = URL.createObjectURL( data );
+};
+
+
+// Start recording and rendering
+const t0 = performance.now();
+
+recorder0.start();
+recorder1.start();
+requestAnimationFrame( drawFrame );
+
+
+function drawFrame(ts)
+{
+	ts -= t0;
+	// ts *= 0.5;
+	if( ts > 2000 )
+	{
+		recorder0.stop();
+		recorder1.stop();
+		return;
+	}
+	requestAnimationFrame( drawFrame );
+
+
+	cx0.fillStyle = '#eee';
+	cx0.fillRect(0,0,400,200);
+
+	// Draw ball at time dependent position
+	const x = (1000 - Math.abs(1000-ts) + 80) * 0.35;
+	cx0.beginPath();
+		cx0.fillStyle = '#888';
+		cx0.arc( x, 100, 40, 0, Math.PI*2 );
+	cx0.closePath();
+	cx0.fill();
+
+	// Copy frame to bitmap context
+	cx2.drawImage( c0, 0, 0 );
+	cx1.transferFromImageBitmap( c2.transferToImageBitmap() );
+}
+
+</script>
