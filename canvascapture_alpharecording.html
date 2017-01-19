@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>HTMLCanvasElement capture into MediaStream demo</title>
+</head>
+<body>
+  <div> Create Real-Time stream from < canvas > and play it back.</div>
+</body>
+
+<div id="container" style="background-color:#c33">
+  <video id="v" width=640 height=360 muted="true" controls autoplay loop>
+    <source src="dancer1.webm" type="video/webm"  />
+  </video>
+  <canvas id="c" width=640 height=360></canvas>
+</div>
+
+<div> Create Real-Time stream from < canvas > and play it back.</div>  
+
+<div>
+  <button id="capture">Start Capturing</button>
+  <button id="record">Start Recording</button>
+  <button id="play" disabled>Play</button>
+  <button id="download" disabled>Download</button>
+</div>
+
+<div id="container" style="background-color:#c33">
+  <video id="vout" width=640 height=360 muted="true" controls autoplay loop>
+  </video>
+  <video id="rout" width=640 height=360 muted="true" controls autoplay loop>
+  </video>
+</div>
+
+</br>
+
+<script>
+var v = document.getElementById('v');
+var c = document.getElementById('c');
+var vout = document.getElementById('vout');
+var rout = document.getElementById('rout');
+var stream;
+var mediaRecorder;
+var recordedBlobs;
+var sourceBuffer;
+
+var captureButton = document.querySelector('button#capture');
+var recordButton = document.querySelector('button#record');
+var playButton = document.querySelector('button#play');
+var downloadButton = document.querySelector('button#download');
+captureButton.onclick = capture;
+recordButton.onclick = toggleRecording;
+playButton.onclick = play;
+downloadButton.onclick = download;
+
+function drawVideo(v,c,w,h) {
+  var context = c.getContext('2d');
+  context.clearRect(0,0,w,h);
+  context.drawImage(v,0,0,w,h);
+  requestAnimationFrame(function(){ drawVideo(v,c,c.width,c.height); });
+}
+
+function toggleRecording() {
+  if (recordButton.textContent === 'Start Recording') {
+    startRecording();
+  } else {
+    stopRecording();
+    recordButton.textContent = 'Start Recording';
+    playButton.disabled = false;
+    downloadButton.disabled = false;
+  }
+}
+
+function capture() {
+  stream = c.captureStream();
+  vout.src = URL.createObjectURL(stream);
+}
+
+function startRecording() {
+  var options = {mimeType: 'video/webm'};
+  recordedBlobs = [];
+  try {
+    mediaRecorder = new MediaRecorder(stream, options);
+  } catch (e0) {
+    console.log('Unable to create MediaRecorder with options Object: ', e0);
+    try {
+      options = {mimeType: 'video/webm,codecs=vp8'};
+      mediaRecorder = new MediaRecorder(stream, options);
+    } catch (e1) {
+      console.log('Unable to create MediaRecorder with options Object: ', e1);
+      try {
+        options = 'video/vp8'; // Chrome 47
+        mediaRecorder = new MediaRecorder(stream, options);
+      } catch (e2) {
+        alert('MediaRecorder is not supported by this browser.\n\n' +
+            'Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Platform features enabled from chrome://flags.');
+        console.error('Exception while creating MediaRecorder:', e2);
+        return;
+      }
+    }
+  }
+  console.log('Created MediaRecorder', mediaRecorder, 'with options', options);
+  recordButton.textContent = 'Stop Recording';
+  playButton.disabled = true;
+  downloadButton.disabled = true;
+  mediaRecorder.onstop = handleStop;
+  mediaRecorder.ondataavailable = handleDataAvailable;
+  mediaRecorder.start(100); // collect 100ms of data
+  console.log('MediaRecorder started', mediaRecorder);
+}
+
+function stopRecording() {
+  mediaRecorder.stop();
+  console.log('Recorded Blobs: ', recordedBlobs);
+}
+
+function handleDataAvailable(event) {
+  if (event.data && event.data.size > 0) {
+    recordedBlobs.push(event.data);
+  }
+}
+
+function handleStop(event) {
+  console.log('Recorder stopped: ', event);
+}
+
+function play() {
+  var superBuffer = new Blob(recordedBlobs, {type: 'video/webm'});
+  rout.src = window.URL.createObjectURL(superBuffer);
+}
+
+function download() {
+  var blob = new Blob(recordedBlobs, {type: 'video/webm'});
+  var url = window.URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = url;
+  a.download = 'test.webm';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function() {
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }, 100);
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  requestAnimationFrame(function(){ drawVideo(v,c,c.width,c.height); });
+},false);
+</script>
+</html>
