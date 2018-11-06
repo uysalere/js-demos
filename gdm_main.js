@@ -47,5 +47,8 @@ function errorMsg(msg, error) {
   }
 }
 
-navigator.getDisplayMedia(constraints).
-    then(handleSuccess).catch(handleError);
+function gdm() {
+  navigator.mediaDevices.getDisplayMedia(constraints)
+      .then(handleSuccess)
+      .catch(handleError);
+}
