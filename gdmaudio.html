@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!--
+ *  Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+-->
+<html>
+<head>
+
+  <meta charset="utf-8">
+  <meta name="description" content="WebRTC code samples">
+  <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+  <meta itemprop="description" content="Client-side WebRTC code samples">
+  <meta itemprop="image" content="../../../images/webrtc-icon-192x192.png">
+  <meta itemprop="name" content="WebRTC code samples">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta id="theme-color" name="theme-color" content="#ffffff">
+
+  <base target="_blank">
+
+  <title>getDisplayMedia</title>
+
+  <link rel="stylesheet" href="gdm_main.css">
+
+</head>
+
+<body>
+
+  <div id="container">
+
+    <video id="gum-local" autoplay playsinline></video>
+
+    <p> To enable this feature in Chrome, toggle the Experimental Web Platform feature (See chrome://flags/#enable-experimental-web-platform-features).</p>
+
+    <button id="btn1" onclick="gdm()">Call getDisplayMedia()</button>
+
+    <div id="errorMsg"></div>
+
+    <p>Display the video stream from <code>getDisplayMedia()</code> in a video element.</p>
+
+    <p>The <code>MediaStream</code> object <code>stream</code> passed to the <code>getDisplayMedia()</code> callback is in global scope, so you can inspect it from the console.</p>
+  </div>
+
+  <script src="gdm_common.js"></script>
+  <script src="gdm_audio.js"></script>
+
+</body>
+</html>
