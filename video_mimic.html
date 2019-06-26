@@ -2,15 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<link rel="shortcut icon" type="image/x-icon" href="https://static.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico" />
-<link rel="mask-icon" type="" href="https://static.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111" />
-<title>CodePen - Fading content</title>
+<title>Fading content</title>
 <style>
-      .fade-in {
+
+body {
+    overflow:hidden;
+}
+
+.fade-in {
   width:1920px;
   height:1080px;
   -webkit-animation: fadeIn linear 1s infinite;
-  transform: perspective(100px) translateZ(0px) scale(0.5) translate(-50%, -50%);
+  transform: translateZ(0px) scale(0.5) translate(-50%, -50%);
 }
 
 @-webkit-keyframes fadeIn {
@@ -33,14 +36,6 @@
   line-height: 20vw;
 }
     </style>
-<script>
-  window.console = window.console || function(t) {};
-</script>
-<script>
-  if (document.location.search.match(/type=embed/gi)) {
-    window.parent.postMessage("resize", "*");
-  }
-</script>
 </head>
 <body translate="no">
 <div class="style fade-in">
